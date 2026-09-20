@@ -2,8 +2,13 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { db } from './db.js';
 import { evaluateTriage, calculateEstimatedWaitTime } from './aiEngine.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = http.createServer(app);
@@ -16,6 +21,10 @@ const io = new Server(server, {
 
 app.use(cors());
 app.use(express.json());
+
+// Serve static frontend files from 'dist' directory if built
+const distPath = path.join(__dirname, '..', 'dist');
+app.use(express.static(distPath));
 
 // Helper to calculate wait times for all waiting tokens
 function getFormattedTokensWithWaitTimes() {
@@ -177,6 +186,18 @@ app.post('/api/emergency/override', (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// Fallback non-API GET requests to dist/index.html for SPA routing
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
+    return next();
+  }
+  res.sendFile(path.join(distPath, 'index.html'), (err) => {
+    if (err) {
+      res.status(200).send('HealthQueue AI Backend Running');
+    }
+  });
 });
 
 const PORT = process.env.PORT || 5000;

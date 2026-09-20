@@ -57,8 +57,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   useEffect(() => {
-    // Socket connection
-    const socket: Socket = io(window.location.origin, {
+    // Dynamic Socket URL target (port 5000 for backend)
+    const socketUrl = window.location.port === '3000'
+      ? `${window.location.protocol}//${window.location.hostname}:5000`
+      : window.location.origin;
+
+    const socket: Socket = io(socketUrl, {
       transports: ['websocket', 'polling']
     });
 
@@ -90,8 +94,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
     });
 
-    // Fallback fetch
-    fetch('/api/queue-status')
+    // Helper for API endpoint
+    const getApiUrl = (path: string) => window.location.port === '3000' ? `http://localhost:5000${path}` : path;
+
+    // Initial fetch
+    fetch(getApiUrl('/api/queue-status'))
       .then(res => res.json())
       .then(data => setQueueState(data))
       .catch(err => console.log('Fetch error:', err));
@@ -100,6 +107,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       socket.disconnect();
     };
   }, []);
+
+  // Helper for API fetch
+  const getApiUrl = (path: string) => window.location.port === '3000' ? `http://localhost:5000${path}` : path;
 
   // Update active token object dynamically when queueState updates
   useEffect(() => {
@@ -114,7 +124,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const clearNotification = () => setNotificationAlert(null);
 
   const generateToken = async (formData: any): Promise<PatientToken> => {
-    const res = await fetch('/api/tokens/generate', {
+    const res = await fetch(getApiUrl('/api/tokens/generate'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
@@ -127,7 +137,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateTokenStatus = async (tokenId: string, status: string, doctorId?: string) => {
-    await fetch('/api/tokens/update-status', {
+    await fetch(getApiUrl('/api/tokens/update-status'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tokenId, status, doctorId: doctorId || activeDoctorId })
@@ -135,7 +145,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const emergencyOverride = async (tokenId: string) => {
-    await fetch('/api/emergency/override', {
+    await fetch(getApiUrl('/api/emergency/override'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tokenId })
@@ -143,7 +153,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const registerDoctor = async (doctorData: any) => {
-    await fetch('/api/doctors/register', {
+    await fetch(getApiUrl('/api/doctors/register'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(doctorData)
