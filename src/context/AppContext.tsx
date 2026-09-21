@@ -56,9 +56,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const BACKEND_URL = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+    ? 'http://localhost:5000'
+    : 'https://hospital-fzpl.onrender.com';
+
+  const getApiUrl = (path: string) => `${BACKEND_URL}${path}`;
+
   useEffect(() => {
-    // Dynamic Socket URL target (port 5000 for backend)
-  const socketUrl = 'https://hospital-fzpl.onrender.com';
+    const socketUrl = BACKEND_URL;
 
     const socket: Socket = io(socketUrl, {
       transports: ['websocket', 'polling']
@@ -92,12 +97,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
     });
 
-    // Helper for API endpoint
-   const getApiUrl = (path: 
-   string) =>
-  `https://hospital-fzpl.onrender.com${path}`;
-   
-
     // Initial fetch
     fetch(getApiUrl('/api/queue-status'))
       .then(res => res.json())
@@ -108,9 +107,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       socket.disconnect();
     };
   }, []);
-
-
-
   // Update active token object dynamically when queueState updates
   useEffect(() => {
     if (activeToken && queueState) {

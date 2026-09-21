@@ -39,8 +39,12 @@ export const AiTriageAssistant: React.FC<{ onSuccess?: () => void }> = ({ onSucc
 
   // Live assessment preview when symptoms/pain changes
   useEffect(() => {
+    const backendUrl = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+      ? 'http://localhost:5000'
+      : 'https://hospital-fzpl.onrender.com';
+
     const timer = setTimeout(() => {
-      fetch('/api/triage/assess', {
+      fetch(`${backendUrl}/api/triage/assess`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
