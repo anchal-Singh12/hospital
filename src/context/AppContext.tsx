@@ -94,7 +94,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // Helper for API endpoint
   const getApiUrl = (path: string) =>
-  https://hospital-fzpl.onrender.com${path};
+  `https://hospital-fzpl.onrender.com${path}`;
 
     // Initial fetch
     fetch(getApiUrl('/api/queue-status'))
@@ -107,8 +107,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, []);
 
-  // Helper for API fetch
-  const getApiUrl = (path: string) => window.location.port === '3000' ? `http://localhost:5000${path}` : path;
+
 
   // Update active token object dynamically when queueState updates
   useEffect(() => {
