@@ -93,9 +93,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     // Helper for API endpoint
-  const getApiUrl = (path: 
-  string) =>
+   const getApiUrl = (path: 
+   string) =>
   `https://hospital-fzpl.onrender.com${path}`;
+   const getApiUrl1 = getApiUrl;
 
     // Initial fetch
     fetch(getApiUrl('/api/queue-status'))
