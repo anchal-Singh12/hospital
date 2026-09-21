@@ -58,9 +58,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     // Dynamic Socket URL target (port 5000 for backend)
-    const socketUrl = window.location.port === '3000'
-      ? `${window.location.protocol}//${window.location.hostname}:5000`
-      : window.location.origin;
+  const socketUrl = 'https://hospital-fzpl.onrender.com';
 
     const socket: Socket = io(socketUrl, {
       transports: ['websocket', 'polling']
@@ -95,7 +93,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     // Helper for API endpoint
-    const getApiUrl = (path: string) => window.location.port === '3000' ? `http://localhost:5000${path}` : path;
+  const getApiUrl = (path: string) =>
+  https://hospital-fzpl.onrender.com${path};
 
     // Initial fetch
     fetch(getApiUrl('/api/queue-status'))
